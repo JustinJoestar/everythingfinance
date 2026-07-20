@@ -1,26 +1,230 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---- Design tokens ----
+   White & gold in light mode, navy & gold in dark. Gold is matte and
+   structural — the color of ledger rules and brand marks, never a
+   gradient. Navy is the ink in light mode and the field in dark mode,
+   so the two themes read as one identity. --panel is a fixed deep navy
+   used for the logo mark and the closing CTA band in both themes. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #fcfbf8;
+  --surface: #ffffff;
+  --surface-raised: #f5f3ec;
+  --edge: #e7e3d8;
+  --ink: #101c31;
+  --muted: #49566c;
+  --faint: #8b94a3;
+  --accent: #8f7420;
+  --accent-strong: #6f5a17;
+  --accent-soft: #f6f0dd;
+  --accent-ink: #ffffff;
+  --panel: #10223c;
+  --panel-ink: #f0f4f9;
+  --panel-muted: #97a9c4;
+  --success: #067647;
+  --danger: #b42318;
+}
+
+.dark {
+  --bg: #0a1728;
+  --surface: #101f36;
+  --surface-raised: #162944;
+  --edge: #24395c;
+  --ink: #eaeff7;
+  --muted: #a3b2c9;
+  --faint: #6a7c96;
+  --accent: #d3ac47;
+  --accent-strong: #e2be5e;
+  --accent-soft: #27220e;
+  --accent-ink: #10203a;
+  --panel: #0d1c33;
+  --panel-ink: #f0f4f9;
+  --panel-muted: #97a9c4;
+  --success: #3fb977;
+  --danger: #ef6b5e;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--surface-raised);
+  --color-edge: var(--edge);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-panel: var(--panel);
+  --color-panel-ink: var(--panel-ink);
+  --color-panel-muted: var(--panel-muted);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-besley), ui-serif, Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+/* ---- The ledger rule ----
+   In accounting, a thin line means subtotal; a thin line over a thick
+   one marks the final total. That mark, in gold, is the site's heading
+   device. Size with w-* utilities; center with mx-auto. */
+.ledger-rule {
+  height: 7px;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 80%, transparent);
+  border-bottom: 3px solid var(--accent);
+}
+
+/* ---- Category tag colors (muted, professional) ---- */
+.cat-stocks {
+  color: #175085;
+  background: #eaf0f7;
+}
+.cat-crypto {
+  color: #5b4a9e;
+  background: #efecf6;
+}
+.cat-macro {
+  color: #45526a;
+  background: #eef0f2;
+}
+.cat-world {
+  color: #0f6b64;
+  background: #e7f2f0;
+}
+.dark .cat-stocks {
+  color: #8ab4e8;
+  background: #17304e;
+}
+.dark .cat-crypto {
+  color: #b3a5e8;
+  background: #272347;
+}
+.dark .cat-macro {
+  color: #a8b8cc;
+  background: #1f3049;
+}
+.dark .cat-world {
+  color: #7cc9c0;
+  background: #123a37;
+}
+
+/* ---- Load sequence: the ledger posts itself ----
+   Elements carry .anim-rise (fade and rise) or .anim-rule (the ledger
+   rule draws left to right), staggered with --d delays. Pure CSS so the
+   sequence runs before hydration and once per load. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.anim-rise {
+  opacity: 0;
+  animation: rise-in 0.6s cubic-bezier(0.25, 0.5, 0.3, 1) forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.anim-rule {
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: rule-draw 0.7s cubic-bezier(0.3, 0.6, 0.2, 1) forwards;
+  animation-delay: var(--d, 0s);
+}
+
+/* ---- Logo pillars regrow on hover ---- */
+.logo-mark .bar {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+a:hover .logo-mark .bar {
+  animation: bar-grow 0.55s cubic-bezier(0.3, 0.6, 0.2, 1);
+}
+a:hover .logo-mark .bar:nth-of-type(2) {
+  animation-delay: 0.07s;
+}
+a:hover .logo-mark .bar:nth-of-type(3) {
+  animation-delay: 0.14s;
+}
+@keyframes bar-grow {
+  0% {
+    transform: scaleY(0.3);
+  }
+  65% {
+    transform: scaleY(1.08);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+/* ---- Flashcard 3D flip ---- */
+.flip-scene {
+  perspective: 1200px;
+}
+.flip-card {
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.flip-card.flipped {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-card {
+    transition: none;
+  }
+  .anim-rise,
+  .anim-rule {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  a:hover .logo-mark .bar {
+    animation: none;
+  }
 }

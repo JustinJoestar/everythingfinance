@@ -1,65 +1,242 @@
-import Image from "next/image";
+import { ArrowRight, BookOpen, Brain, Flame, Newspaper } from "lucide-react";
+import Link from "next/link";
 
-export default function Home() {
+import { Button } from "@/components/ui/button";
+import {
+  CategoryShowcase,
+  type ShowcaseTile,
+} from "@/components/ui/category-showcase";
+import { HeroSection } from "@/components/ui/hero-section";
+import { LedgerRule } from "@/components/ui/ledger-rule";
+import { Reveal } from "@/components/ui/reveal";
+import { getShowcase } from "@/lib/data";
+import { relativeTime } from "@/lib/dates";
+import { CATEGORIES, CATEGORY_LABELS } from "@/lib/types";
+
+// Refresh the prerendered landing page every 5 minutes so the showcase
+// tracks the hourly ingestion without a database hit per visit.
+export const revalidate = 300;
+
+const SOURCES = [
+  "Yahoo Finance",
+  "CNBC",
+  "MarketWatch",
+  "CoinDesk",
+  "Cointelegraph",
+  "BBC News",
+  "The Guardian",
+  "Federal Reserve",
+];
+
+const FEATURES = [
+  {
+    icon: Newspaper,
+    title: "One feed for everything",
+    text: "Stocks, crypto, macro, and world events from major outlets in one stream. Each story gets a summary of two or three plain sentences.",
+  },
+  {
+    icon: Brain,
+    title: "Flashcards that stick",
+    text: "Each week's news becomes a deck of spaced-repetition flashcards. A card comes back right before you'd forget it.",
+  },
+  {
+    icon: BookOpen,
+    title: "A glossary without jargon",
+    text: "Every finance term defined in plain language. If one is missing, ask and it gets added for everyone.",
+  },
+  {
+    icon: Flame,
+    title: "A streak worth keeping",
+    text: "Read the daily recap, review a card, or take the weekly quiz to keep your learning streak alive, one day at a time.",
+  },
+];
+
+const STEPS = [
+  {
+    number: "01",
+    title: "We read everything",
+    text: "A pipeline pulls finance news from wire services, market desks, and central banks every hour.",
+  },
+  {
+    number: "02",
+    title: "AI translates it",
+    text: "Each story gets one summary in plain English, without the jargon, and a category so you can filter to what you care about.",
+  },
+  {
+    number: "03",
+    title: "You make it stick",
+    text: "A daily recap, weekly quiz, and spaced-repetition flashcards turn reading the news into actually understanding the markets.",
+  },
+];
+
+export default async function LandingPage() {
+  const showcase = await getShowcase();
+  const tiles: ShowcaseTile[] = CATEGORIES.map((category) => ({
+    category,
+    label: CATEGORY_LABELS[category],
+    stories: (showcase[category] ?? []).map((a) => ({
+      url: a.url,
+      title: a.title,
+      summary: a.summary ?? "",
+      source: a.source,
+      time: relativeTime(a.published_at),
+    })),
+  }));
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="space-y-20 pb-10 pt-6 sm:space-y-24 lg:pt-10">
+      {/* ---- Hero: centered typewriter over the live category tiles ---- */}
+      <section className="relative">
+        <div
+          className="pointer-events-none absolute -top-40 right-[-10%] -z-10 h-[480px] w-[480px] rounded-full bg-accent/[0.07] blur-3xl"
+          aria-hidden
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+        <HeroSection
+          title={
+            <>
+              Finance today,
+              <br className="hidden sm:inline" /> in plain English.
+            </>
+          }
+          animatedTexts={["Stocks", "Crypto", "Macro", "World news"]}
+          subtitle="Every story lands in one feed, summarized in two or three plain sentences. Flashcards, quizzes, and a glossary help you remember what you read."
+          primaryCta={{ label: "Read today’s feed", href: "/feed" }}
+          secondaryCta={{ label: "How it works", href: "#how-it-works" }}
+          finePrint="Free to read · No account required · Updated hourly"
+        />
+        <div className="mt-14">
+          <CategoryShowcase tiles={tiles} />
+        </div>
+      </section>
+
+      {/* ---- Sources ---- */}
+      <section aria-label="News sources">
+        <Reveal>
+          <p className="text-center font-mono text-xs font-medium uppercase tracking-[0.18em] text-faint">
+            Compiling coverage from
           </p>
+          <ul className="mx-auto mt-5 flex max-w-3xl flex-wrap items-center justify-center gap-x-4 gap-y-3">
+            {SOURCES.map((name, i) => (
+              <li
+                key={name}
+                className="flex items-center gap-4 whitespace-nowrap font-mono text-[13px] text-muted/90"
+              >
+                {i > 0 && (
+                  <span className="text-accent/60" aria-hidden>
+                    ·
+                  </span>
+                )}
+                {name}
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+      </section>
+
+      {/* ---- Features ---- */}
+      <section aria-labelledby="features-heading">
+        <Reveal>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2
+              id="features-heading"
+              className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl"
+            >
+              Read it. Then actually remember it.
+            </h2>
+            <LedgerRule className="mx-auto mt-5 w-14" origin="center" delay={0.15} />
+            <p className="mt-5 text-muted">
+              Aggregators stop at the headline. Everything Finance is built for
+              what happens after, when you try to remember what any of it
+              meant.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURES.map(({ icon: Icon, title, text }, i) => (
+            <Reveal key={title} delay={i * 0.06} className="h-full">
+              <div className="h-full rounded-xl border border-edge bg-surface p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-md">
+                <span className="grid h-10 w-10 place-items-center rounded-lg bg-accent-soft text-accent">
+                  <Icon className="h-5 w-5" aria-hidden />
+                </span>
+                <h3 className="mt-4 text-base font-semibold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  {text}
+                </p>
+              </div>
+            </Reveal>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      {/* ---- How it works ---- */}
+      <section
+        id="how-it-works"
+        aria-labelledby="how-heading"
+        className="scroll-mt-24"
+      >
+        <Reveal>
+          <h2
+            id="how-heading"
+            className="text-center font-serif text-3xl font-semibold tracking-tight sm:text-4xl"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            How it works
+          </h2>
+          <LedgerRule className="mx-auto mt-5 w-14" origin="center" delay={0.15} />
+          <div className="mt-12 grid gap-10 lg:grid-cols-3 lg:gap-8">
+            {STEPS.map(({ number, title, text }) => (
+              <div key={number} className="border-t border-edge pt-6">
+                <p className="font-mono text-sm font-medium text-accent">
+                  {number}
+                </p>
+                <h3 className="mt-2 text-lg font-semibold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  {text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ---- Closing CTA ---- */}
+      <Reveal>
+        <section
+          aria-label="Get started"
+          className="rounded-2xl bg-panel px-8 py-14 text-center ring-1 ring-white/10"
+        >
+          <h2 className="mx-auto max-w-2xl text-balance font-serif text-3xl font-semibold tracking-tight text-panel-ink sm:text-4xl">
+            Five minutes a day is enough to follow the markets.
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-panel-muted">
+            Start with today&rsquo;s recap. Come back tomorrow. The streak
+            takes care of the rest.
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button
+              asChild
+              size="lg"
+              className="bg-[#d3ac47] text-[#10203a] shadow-sm hover:bg-[#e2be5e]"
+            >
+              <Link href="/feed" className="group">
+                Read today&rsquo;s news
+                <ArrowRight
+                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="ghost"
+              className="text-panel-muted hover:bg-white/10 hover:text-panel-ink"
+            >
+              <Link href="/glossary">Browse the glossary</Link>
+            </Button>
+          </div>
+        </section>
+      </Reveal>
     </div>
   );
 }
