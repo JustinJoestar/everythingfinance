@@ -23,21 +23,35 @@ const MARKERS: { location: [number, number]; size: number }[] = [
   { location: [-23.55, -46.63], size: 0.045 },
 ];
 
-// COBE takes linear RGB in 0..1. Gold marks stay constant; the sphere and
-// glow shift so the globe sits on cream in light mode and navy in dark.
-const GOLD: [number, number, number] = [0.83, 0.67, 0.28];
-const THEME = {
+// COBE takes linear RGB in 0..1. Each theme uses the site's own tokens: a
+// warm parchment sphere with muted old-gold marks (#8f7420) on the cream
+// light theme, a navy sphere with bright gold marks (#d3ac47) on the navy
+// dark theme. `dark` controls day/night shading: low in light mode so the
+// sphere stays pale, full in dark mode for depth.
+type ThemeCfg = {
+  base: [number, number, number];
+  marker: [number, number, number];
+  glow: [number, number, number];
+  brightness: number;
+  baseBrightness: number;
+  dark: number;
+};
+const THEME: { light: ThemeCfg; dark: ThemeCfg } = {
   light: {
-    base: [0.21, 0.29, 0.44] as [number, number, number],
-    glow: [0.92, 0.9, 0.84] as [number, number, number],
-    brightness: 9,
-    baseBrightness: 0.22,
+    base: [0.64, 0.54, 0.34],
+    marker: [0.4, 0.31, 0.06],
+    glow: [0.99, 0.98, 0.95],
+    brightness: 5,
+    baseBrightness: 0.16,
+    dark: 0.45,
   },
   dark: {
-    base: [0.13, 0.2, 0.33] as [number, number, number],
-    glow: [0.05, 0.1, 0.19] as [number, number, number],
+    base: [0.13, 0.2, 0.33],
+    marker: [0.83, 0.67, 0.28],
+    glow: [0.05, 0.1, 0.19],
     brightness: 6,
     baseBrightness: 0.05,
+    dark: 1,
   },
 };
 
@@ -115,13 +129,13 @@ export function Globe({ className = "" }: { className?: string }) {
         height: widthRef.current * 2,
         phi: 0,
         theta: 0.25,
-        dark: 1,
+        dark: theme.dark,
         diffuse: 1.2,
         mapSamples: 16000,
         mapBrightness: theme.brightness,
         mapBaseBrightness: theme.baseBrightness,
         baseColor: theme.base,
-        markerColor: GOLD,
+        markerColor: theme.marker,
         glowColor: theme.glow,
         markers: MARKERS,
       });

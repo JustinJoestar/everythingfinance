@@ -92,12 +92,12 @@ export default async function LandingPage() {
           className="pointer-events-none absolute -top-40 right-[-10%] -z-10 h-[480px] w-[480px] rounded-full bg-accent/[0.07] blur-3xl"
           aria-hidden
         />
-        <div className="grid items-center gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10">
-          {/* The globe fills the left space on wide screens; below lg there
-              is no empty margin to fill, so it drops out and the hero
-              centers on its own. */}
+        <div className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8">
+          {/* The globe fills the left space on wide screens, pushed toward
+              the left margin. Below lg there is no empty margin to fill, so
+              it drops out and the hero centers on its own. */}
           <div className="hidden lg:block">
-            <Globe className="mx-auto w-full max-w-[26rem]" />
+            <Globe className="w-full max-w-[30rem] -ml-4 xl:-ml-16" />
           </div>
           <HeroSection
             title={
