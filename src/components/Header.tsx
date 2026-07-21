@@ -36,20 +36,25 @@ export function Header({
   return (
     <header className="sticky top-0 z-40 border-b border-edge bg-surface/90 backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        {/* Brand left, nav center, actions right: justify-between opens the
-            row up. The nav folds to its own line below the lg breakpoint. */}
-        <div className="flex h-16 items-center justify-between gap-6">
+        {/* On lg a 1fr / auto / 1fr grid pins the brand far left and the
+            actions far right while the nav sits dead-center of the row, not
+            just between the two. Below lg the nav folds to its own line, so
+            the row is a plain flex to keep the wordmark from wrapping. */}
+        <div className="flex h-16 items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="flex shrink-0 items-center gap-2.5 justify-self-start rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <Logo className="h-8 w-8" />
-            <span className="font-serif text-lg font-semibold tracking-tight">
+            <span className="whitespace-nowrap font-serif text-lg font-semibold tracking-tight">
               Everything Finance
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+          <nav
+            className="hidden items-center gap-1 justify-self-center lg:flex"
+            aria-label="Main"
+          >
             {NAV.map(({ href, label }) => (
               <Link
                 key={href}
@@ -62,7 +67,7 @@ export function Header({
             ))}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-2 justify-self-end sm:gap-3">
             {streakDays > 0 && (
               <span
                 title={`${streakDays}-day learning streak`}
