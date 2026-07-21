@@ -14,7 +14,7 @@ const ET = "America/New_York";
 
 // Minutes past each hour when the ingest cron fires, in UTC. Keep in sync
 // with the ingestion schedule in .github/workflows/cron.yml.
-const UPDATE_MINUTES = [7, 37];
+const UPDATE_MINUTES = [0, 30];
 
 // Seconds until the next scheduled ingestion. Computed in UTC so the
 // count is right no matter what timezone the viewer is in.
