@@ -6,7 +6,6 @@ import {
   CategoryShowcase,
   type ShowcaseTile,
 } from "@/components/ui/category-showcase";
-import { Globe } from "@/components/ui/globe";
 import { HeroSection } from "@/components/ui/hero-section";
 import { LedgerRule } from "@/components/ui/ledger-rule";
 import { Reveal } from "@/components/ui/reveal";
@@ -92,27 +91,19 @@ export default async function LandingPage() {
           className="pointer-events-none absolute -top-40 right-[-10%] -z-10 h-[480px] w-[480px] rounded-full bg-accent/[0.07] blur-3xl"
           aria-hidden
         />
-        <div className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8">
-          {/* The globe fills the left space on wide screens, pushed toward
-              the left margin. Below lg there is no empty margin to fill, so
-              it drops out and the hero centers on its own. */}
-          <div className="hidden lg:block">
-            <Globe className="w-full max-w-[30rem] -ml-4 xl:-ml-16" />
-          </div>
-          <HeroSection
-            title={
-              <>
-                Finance today,
-                <br className="hidden sm:inline" /> in plain English.
-              </>
-            }
-            animatedTexts={["Stocks", "Crypto", "Macro", "World news"]}
-            subtitle="Every story lands in one feed, summarized in two or three plain sentences. Flashcards, quizzes, and a glossary help you remember what you read."
-            primaryCta={{ label: "Read today’s feed", href: "/feed" }}
-            secondaryCta={{ label: "How it works", href: "#how-it-works" }}
-            finePrint="Free to read · No account required · Updated every 30 minutes"
-          />
-        </div>
+        <HeroSection
+          title={
+            <>
+              Finance today,
+              <br className="hidden sm:inline" /> in plain English.
+            </>
+          }
+          animatedTexts={["Stocks", "Crypto", "Macro", "World news"]}
+          subtitle="Every story lands in one feed, summarized in two or three plain sentences. Flashcards, quizzes, and a glossary help you remember what you read."
+          primaryCta={{ label: "Read today’s feed", href: "/feed" }}
+          secondaryCta={{ label: "How it works", href: "#how-it-works" }}
+          finePrint="Free to read · No account required · Updated every 30 minutes"
+        />
         <div className="mt-14">
           <CategoryShowcase tiles={tiles} />
         </div>
