@@ -29,6 +29,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  // Canonical base for absolute URLs in Open Graph and shared links. The
+  // apex redirects here, so www is the site's real address.
+  metadataBase: new URL("https://www.everythingfinance.org"),
   title: {
     default: "Everything Finance: finance news, explained simply",
     template: "%s · Everything Finance",
@@ -40,6 +43,7 @@ export const metadata: Metadata = {
     description:
       "Finance news in plain English, plus learning tools that help it stick.",
     siteName: "Everything Finance",
+    url: "https://www.everythingfinance.org",
     type: "website",
   },
 };
