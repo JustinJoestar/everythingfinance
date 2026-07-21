@@ -1,14 +1,37 @@
 "use client";
 
+import { RefreshCw } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
 // The hero kicker: today's date in the serif with a live Eastern Time
 // clock on the same baseline, like a newspaper's edition line. The app
 // thinks in ET days (recaps, streaks), so the clock is ET, labeled.
+// Alongside it, a live countdown to the next ingestion run.
 // useSyncExternalStore keeps hydration clean: the server renders the
 // placeholder, and the client swaps in the real time right after mount.
 
 const ET = "America/New_York";
+
+// Minutes past each hour when the ingest cron fires, in UTC. Keep in sync
+// with the ingestion schedule in .github/workflows/cron.yml.
+const UPDATE_MINUTES = [7, 37];
+
+// Seconds until the next scheduled ingestion. Computed in UTC so the
+// count is right no matter what timezone the viewer is in.
+function secsToNextUpdate(now: Date): number {
+  const secOfHour = now.getUTCMinutes() * 60 + now.getUTCSeconds();
+  for (const min of UPDATE_MINUTES) {
+    const target = min * 60;
+    if (secOfHour < target) return target - secOfHour;
+  }
+  return 3600 - secOfHour + UPDATE_MINUTES[0] * 60;
+}
+
+function formatCountdown(totalSecs: number): string {
+  const m = Math.floor(totalSecs / 60);
+  const s = totalSecs % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
 
 let lastTick = Math.floor(Date.now() / 1000);
 
@@ -51,8 +74,11 @@ export function Dateline() {
       })
     : "--:--:--";
 
+  const secsLeft = now ? secsToNextUpdate(now) : null;
+  const countdown = secsLeft === null ? "--:--" : formatCountdown(secsLeft);
+
   return (
-    <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+    <div className="flex flex-wrap items-baseline justify-center gap-x-4 gap-y-1">
       <p className="font-serif text-xl font-semibold tracking-tight text-ink sm:text-2xl">
         {date}
       </p>
@@ -63,6 +89,11 @@ export function Dateline() {
         />
         <span className="tabular-nums">{time}</span>
         <span className="text-faint">ET</span>
+      </p>
+      <p className="flex items-center gap-1.5 font-mono text-[13px] text-faint">
+        <RefreshCw className="h-3 w-3" aria-hidden />
+        <span>next update in</span>
+        <span className="tabular-nums text-muted">{countdown}</span>
       </p>
     </div>
   );
