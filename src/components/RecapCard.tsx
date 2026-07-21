@@ -1,12 +1,14 @@
 "use client";
 
 import { track } from "@vercel/analytics";
+import { RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { Recap } from "@/lib/types";
 
 import { LedgerRule } from "./ui/ledger-rule";
+import { secsToNextUpdate, useNextUpdate } from "./ui/use-next-update";
 
 export function RecapCard({
   recap,
@@ -22,6 +24,26 @@ export function RecapCard({
   const router = useRouter();
   const [done, setDone] = useState(alreadyDoneToday);
   const [busy, setBusy] = useState(false);
+  const countdown = useNextUpdate();
+
+  // Pull a fresh recap shortly after each update boundary. The buffer lets
+  // the ingest run and, if it found new articles, the recap regenerate
+  // before we re-fetch. Reschedules itself for the next boundary.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    const schedule = () => {
+      const secs = secsToNextUpdate(new Date());
+      timer = setTimeout(
+        () => {
+          router.refresh();
+          schedule();
+        },
+        (secs + 90) * 1000
+      );
+    };
+    schedule();
+    return () => clearTimeout(timer);
+  }, [router]);
 
   async function markRead() {
     setBusy(true);
@@ -50,6 +72,12 @@ export function RecapCard({
         </span>
       </div>
       <LedgerRule className="mt-3 w-14" delay={0.15} />
+
+      <p className="mt-3 flex items-center gap-1.5 font-mono text-[12px] text-faint">
+        <RefreshCw className="h-3 w-3" aria-hidden />
+        <span>next update in</span>
+        <span className="tabular-nums text-muted">{countdown ?? "--:--"}</span>
+      </p>
 
       <ul className="mt-4 space-y-3">
         {recap.bullets.map((b, i) => (

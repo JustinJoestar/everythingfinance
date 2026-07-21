@@ -1,57 +1,24 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
-import { useSyncExternalStore } from "react";
+
+import {
+  formatCountdown,
+  secsToNextUpdate,
+  useSecondTick,
+} from "./use-next-update";
 
 // The hero kicker: today's date in the serif with a live Eastern Time
 // clock on the same baseline, like a newspaper's edition line. The app
 // thinks in ET days (recaps, streaks), so the clock is ET, labeled.
-// Alongside it, a live countdown to the next ingestion run.
-// useSyncExternalStore keeps hydration clean: the server renders the
-// placeholder, and the client swaps in the real time right after mount.
+// Alongside it, a live countdown to the next pipeline update (shared with
+// the recap card). useSecondTick keeps hydration clean: the server renders
+// the placeholder, and the client swaps in the real time after mount.
 
 const ET = "America/New_York";
 
-// Minutes past each hour when the ingest cron fires, in UTC. Keep in sync
-// with the ingestion schedule in .github/workflows/cron.yml.
-const UPDATE_MINUTES = [0, 30];
-
-// Seconds until the next scheduled ingestion. Computed in UTC so the
-// count is right no matter what timezone the viewer is in.
-function secsToNextUpdate(now: Date): number {
-  const secOfHour = now.getUTCMinutes() * 60 + now.getUTCSeconds();
-  for (const min of UPDATE_MINUTES) {
-    const target = min * 60;
-    if (secOfHour < target) return target - secOfHour;
-  }
-  return 3600 - secOfHour + UPDATE_MINUTES[0] * 60;
-}
-
-function formatCountdown(totalSecs: number): string {
-  const m = Math.floor(totalSecs / 60);
-  const s = totalSecs % 60;
-  return `${m}:${String(s).padStart(2, "0")}`;
-}
-
-let lastTick = Math.floor(Date.now() / 1000);
-
-function subscribe(onChange: () => void) {
-  const id = setInterval(() => {
-    lastTick = Math.floor(Date.now() / 1000);
-    onChange();
-  }, 1000);
-  return () => clearInterval(id);
-}
-
-const getTick = () => lastTick;
-const getServerTick = () => null;
-
 export function Dateline() {
-  const tick = useSyncExternalStore<number | null>(
-    subscribe,
-    getTick,
-    getServerTick
-  );
+  const tick = useSecondTick();
   const now = tick === null ? null : new Date(tick * 1000);
 
   const date = now
