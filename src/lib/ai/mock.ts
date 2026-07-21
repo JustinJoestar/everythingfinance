@@ -24,10 +24,12 @@ export const mockAdapter: AIAdapter = {
   async summarizeArticles(articles: ArticleInput[]): Promise<SummaryResult[]> {
     return articles.map((a) => ({
       id: a.id,
+      relevant: true,
       summary:
         firstSentences(a.description || a.title) +
-        " (Sample summary — connect a Gemini API key for real AI summaries.)",
+        " (Sample summary. Connect a Gemini API key for real AI summaries.)",
       categories: [a.hint ?? "stocks"],
+      reason: "mock adapter keeps every article",
     }));
   },
 

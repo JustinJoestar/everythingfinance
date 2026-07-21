@@ -38,6 +38,7 @@ export interface IngestStats {
   fetched: number;
   newArticles: number;
   summarized: number;
+  rejected: number;
   aiCalls: number;
   skippedBudget: boolean;
   errors: string[];
@@ -129,10 +130,13 @@ export async function runIngestion(): Promise<IngestStats> {
     fetched: 0,
     newArticles: 0,
     summarized: 0,
+    rejected: 0,
     aiCalls: 0,
     skippedBudget: false,
     errors: [],
   };
+  // Sample of rejection reasons, logged for spot-checking the filter.
+  const rejects: string[] = [];
   const db = getAdminClient();
   const ai = getAI();
 
@@ -248,7 +252,18 @@ export async function runIngestion(): Promise<IngestStats> {
       const byId = new Map(results.map((r) => [r.id, r]));
       for (const a of batch) {
         const r = byId.get(a.id);
-        if (r && r.summary && r.categories.length > 0) {
+        if (r && r.relevant === false) {
+          // Off-topic story: park it as rejected so the feed never shows it
+          // and no run retries it.
+          await db
+            .from("articles")
+            .update({ status: "rejected" })
+            .eq("id", a.id);
+          stats.rejected += 1;
+          if (rejects.length < 8) {
+            rejects.push(`"${a.title.slice(0, 70)}" — ${r.reason || "off topic"}`);
+          }
+        } else if (r && r.summary && r.categories.length > 0) {
           await db
             .from("articles")
             .update({ summary: r.summary, categories: r.categories, status: "live" })
@@ -269,8 +284,9 @@ export async function runIngestion(): Promise<IngestStats> {
   }
 
   console.log(
-    `[ingest] fetched=${stats.fetched} new=${stats.newArticles} summarized=${stats.summarized} aiCalls=${stats.aiCalls}${stats.skippedBudget ? " BUDGET-CAPPED" : ""}`,
+    `[ingest] fetched=${stats.fetched} new=${stats.newArticles} summarized=${stats.summarized} rejected=${stats.rejected} aiCalls=${stats.aiCalls}${stats.skippedBudget ? " BUDGET-CAPPED" : ""}`,
     stats.errors.length ? stats.errors : ""
   );
+  if (rejects.length) console.log("[ingest] filtered out:\n  " + rejects.join("\n  "));
   return stats;
 }

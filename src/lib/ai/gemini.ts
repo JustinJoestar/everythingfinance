@@ -88,30 +88,47 @@ export const geminiAdapter: AIAdapter = {
       })
       .join("\n");
 
-    const prompt = `You summarize finance news for "Everything Finance". ${AUDIENCE}
+    const prompt = `You screen and summarize finance news for "Everything Finance". ${AUDIENCE}
 
-For EACH article below, write a 2-3 sentence plain-English summary of what happened and why it matters, and assign 1-2 categories from exactly this list: "stocks" (companies, equities, markets), "crypto", "macro" (rates, inflation, jobs, central banks), "world" (geopolitics, energy, policy that moves markets).
+The site covers four topics only:
+- "stocks": public companies, their shares, earnings, deals, and stock markets.
+- "crypto": cryptocurrencies, tokens, exchanges, and blockchain finance.
+- "macro": interest rates, inflation, jobs, GDP, and central banks.
+- "world": geopolitics, energy, trade, and government policy that moves markets.
+
+For EACH article, first decide if it truly belongs on this site. Set "relevant": false when the story is not really about markets, investing, or the economy, even when it comes from a business section. Reject consumer or lifestyle trends, personal money anecdotes, product reviews, how-to and career pieces, celebrity, sports, and general "business of X" features that do not touch a company's finances, markets, crypto, macro data, or market-moving policy. When unsure, reject.
+
+For each RELEVANT article: write a 2-3 sentence plain-English summary of what happened and why it matters, assign 1-2 categories from the list above, and give a short "reason" (one clause) for the main category. Do not force a category: if nothing fits, the article is not relevant.
+For each IRRELEVANT article: set "relevant": false, "summary": "", "categories": [], and a short "reason" for the rejection.
 
 Return ONLY a JSON array, one object per article, shaped like:
-[{"id": "<the id given>", "summary": "...", "categories": ["stocks"]}]
+[{"id": "<the id given>", "relevant": true, "summary": "...", "categories": ["stocks"], "reason": "..."}]
 
 Articles:
 ${list}`;
 
     const raw = await callGemini(prompt);
     const parsed = parseJson<
-      { id: string; summary: string; categories: unknown[] }[]
+      {
+        id: string;
+        relevant?: boolean;
+        summary?: string;
+        categories?: unknown[];
+        reason?: string;
+      }[]
     >(raw);
     if (!Array.isArray(parsed)) throw new Error("Expected a JSON array");
 
     return parsed
-      .filter((p) => p && typeof p.id === "string" && typeof p.summary === "string")
+      .filter((p) => p && typeof p.id === "string")
       .map((p) => ({
         id: p.id,
-        summary: p.summary.trim(),
+        relevant: p.relevant !== false,
+        summary: typeof p.summary === "string" ? p.summary.trim() : "",
         categories: (Array.isArray(p.categories)
           ? p.categories.filter(isCategory)
           : []) as Category[],
+        reason: typeof p.reason === "string" ? p.reason.trim() : "",
       }));
   },
 

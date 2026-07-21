@@ -15,8 +15,12 @@ export interface ArticleInput {
 
 export interface SummaryResult {
   id: string;
+  /** false when the story is not real finance/markets/economy news. */
+  relevant: boolean;
   summary: string;
   categories: Category[];
+  /** Short note on the category choice or the reason for rejection. */
+  reason: string;
 }
 
 export interface DigestItem {
