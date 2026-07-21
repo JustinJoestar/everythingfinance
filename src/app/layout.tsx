@@ -48,9 +48,10 @@ export const metadata: Metadata = {
   },
 };
 
-// Flips dark mode before first paint (no flash), honoring the saved choice
-// or the system preference.
-const themeScript = `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",d)}catch(e){}})();`;
+// Sets the theme before first paint (no flash). Defaults to light, and
+// only goes dark when the visitor has explicitly chosen it. The system
+// preference is not followed, so first-time visitors always see light.
+const themeScript = `(function(){try{var d=localStorage.getItem("theme")==="dark";document.documentElement.classList.toggle("dark",d)}catch(e){}})();`;
 
 export default async function RootLayout({
   children,
