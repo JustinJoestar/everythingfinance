@@ -4,7 +4,7 @@ import { supabaseConfigured } from "@/lib/config";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { runIngestion } from "@/lib/ingest";
 
-// Hourly ingestion: fetch news → de-dupe → AI summarize → store.
+// Scheduled ingestion (every 30 min): fetch news → de-dupe → AI summarize → store.
 // Triggered by the GitHub Actions scheduler (see .github/workflows/cron.yml).
 
 export const maxDuration = 300;

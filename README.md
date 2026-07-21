@@ -12,7 +12,7 @@ RSS and the Guardian), with hard guards so a surprise bill can't happen.
 
 ```
 GitHub Actions (free scheduler)
-  ├─ hourly  → POST /api/cron/ingest   RSS + Guardian → de-dupe → Gemini
+  ├─ every 30m → POST /api/cron/ingest RSS + Guardian → de-dupe → Gemini
   │                                    summarize/categorize → Postgres
   ├─ daily   → POST /api/cron/recap    3-5 bullet "Today's recap"
   └─ weekly  → POST /api/cron/weekly   flashcards + quiz from the week's news
@@ -84,8 +84,8 @@ business/world coverage.
 
 1. In the GitHub repo: Settings → Secrets and variables → Actions → add
    `APP_URL` (your Vercel URL, no trailing slash) and `CRON_SECRET`.
-2. The workflow in `.github/workflows/cron.yml` now runs ingestion hourly,
-   the recap daily, and flashcards/quiz weekly.
+2. The workflow in `.github/workflows/cron.yml` runs ingestion every 30
+   minutes, the recap daily, and flashcards/quiz weekly.
 3. Kick things off manually: Actions → "Scheduled jobs" → Run workflow →
    `seed` (loads the glossary), then `ingest`, then `recap`, then `weekly`.
 

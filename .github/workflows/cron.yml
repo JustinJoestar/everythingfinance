@@ -1,6 +1,6 @@
 # Free scheduler for the ingestion pipeline. Vercel's free plan only allows
 # once-daily crons, so GitHub Actions triggers our endpoints instead:
-#   - hourly:  news ingestion (+ AI summaries)
+#   - every 30m: news ingestion (+ AI summaries)
 #   - daily:   "Today's recap" (~6:30 AM ET)
 #   - weekly:  flashcards + quiz (Mondays)
 #
@@ -12,7 +12,7 @@ name: Scheduled jobs
 
 on:
   schedule:
-    - cron: "7 * * * *"    # hourly ingestion (minute 7 to avoid load spikes)
+    - cron: "7,37 * * * *"  # ingestion every 30 min (offset minutes to avoid load spikes)
     - cron: "35 10 * * *"  # daily recap — 10:35 UTC ≈ 6:35 AM ET
     - cron: "50 10 * * 1"  # weekly flashcards + quiz — Mondays
   workflow_dispatch:

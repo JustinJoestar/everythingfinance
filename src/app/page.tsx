@@ -14,7 +14,7 @@ import { relativeTime } from "@/lib/dates";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/types";
 
 // Refresh the prerendered landing page every 5 minutes so the showcase
-// tracks the hourly ingestion without a database hit per visit.
+// tracks each ingestion run without a database hit per visit.
 export const revalidate = 300;
 
 const SOURCES = [
@@ -55,7 +55,7 @@ const STEPS = [
   {
     number: "01",
     title: "We read everything",
-    text: "A pipeline pulls finance news from wire services, market desks, and central banks every hour.",
+    text: "A pipeline pulls finance news from wire services, market desks, and central banks every 30 minutes.",
   },
   {
     number: "02",
@@ -102,7 +102,7 @@ export default async function LandingPage() {
           subtitle="Every story lands in one feed, summarized in two or three plain sentences. Flashcards, quizzes, and a glossary help you remember what you read."
           primaryCta={{ label: "Read today’s feed", href: "/feed" }}
           secondaryCta={{ label: "How it works", href: "#how-it-works" }}
-          finePrint="Free to read · No account required · Updated hourly"
+          finePrint="Free to read · No account required · Updated every 30 minutes"
         />
         <div className="mt-14">
           <CategoryShowcase tiles={tiles} />
