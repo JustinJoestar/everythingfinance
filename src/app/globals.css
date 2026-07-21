@@ -231,9 +231,10 @@ a:hover .logo-mark .bar:nth-of-type(3) {
 
 /* ---- Shiny CTA ----
    An animated conic-gradient shine on the primary calls to action, rebuilt
-   from a black/blue demo into the ledger palette: a navy pill with a gold
-   shine that rotates around the border. `.shiny-cta-gold` flips it to a gold
-   pill for the navy CTA band. Holds still under prefers-reduced-motion. */
+   from a black/blue demo into the ledger palette. The default is a gold pill
+   (matches the white+gold light theme) that turns navy on the dark theme.
+   `.shiny-cta-gold` keeps it gold in both themes for the navy CTA band.
+   Holds still under prefers-reduced-motion. */
 @property --gradient-angle {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -256,11 +257,12 @@ a:hover .logo-mark .bar:nth-of-type(3) {
 }
 
 .shiny-cta {
-  --shiny-cta-bg: #10223c;
-  --shiny-cta-bg-subtle: #24406b;
-  --shiny-cta-fg: #f0f4f9;
-  --shiny-cta-highlight: #d3ac47;
-  --shiny-cta-highlight-subtle: #e2be5e;
+  --shiny-cta-bg: #d3ac47;
+  --shiny-cta-bg-subtle: #b8933a;
+  --shiny-cta-fg: #10203a;
+  --shiny-cta-highlight: #10223c;
+  --shiny-cta-highlight-subtle: #24406b;
+  --gradient-shine: #ffffff;
   --animation: gradient-angle linear infinite;
   --duration: 3s;
   --shadow-size: 2px;
@@ -309,6 +311,10 @@ a:hover .logo-mark .bar:nth-of-type(3) {
 .dark .shiny-cta:not(.shiny-cta-gold) {
   --shiny-cta-bg: #1b3865;
   --shiny-cta-bg-subtle: #2c4c80;
+  --shiny-cta-fg: #f0f4f9;
+  --shiny-cta-highlight: #d3ac47;
+  --shiny-cta-highlight-subtle: #e2be5e;
+  --gradient-shine: #fff7e6;
 }
 
 .shiny-cta::before,
