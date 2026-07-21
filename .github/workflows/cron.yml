@@ -51,3 +51,13 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             --max-time 320 \
             "${{ secrets.APP_URL }}${{ steps.pick.outputs.path }}"
+          # On the frequent ingest runs, also make sure today's recap exists.
+          # The recap endpoint self-skips once generated, so this is free
+          # after the first success each ET day and keeps the recap from
+          # going stale if the once-daily run is ever missed.
+          if [ "${{ steps.pick.outputs.path }}" = "/api/cron/ingest" ]; then
+            curl --fail-with-body -sS -X POST \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              --max-time 120 \
+              "${{ secrets.APP_URL }}/api/cron/recap" || true
+          fi
