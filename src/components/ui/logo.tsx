@@ -1,7 +1,9 @@
 // The brand mark: three gold pillars — a bank colonnade that also reads
 // as a rising bar chart — standing on the ledger rule (thin over thick,
-// the accounting "total" mark). Fixed navy/gold in both themes; the
-// hairline keyline keeps the tile visible on navy backgrounds.
+// the accounting "total" mark). The gold stays constant, since it always
+// sits on navy. The tile lifts to a lighter navy in dark mode, where the
+// deep navy would otherwise vanish into the dark header, and the gold
+// keyline strengthens to hold the edge.
 
 export function Logo({ className }: { className?: string }) {
   return (
@@ -10,7 +12,12 @@ export function Logo({ className }: { className?: string }) {
       className={`logo-mark ${className ?? ""}`}
       aria-hidden="true"
     >
-      <rect width="64" height="64" rx="14" fill="#10223c" />
+      <rect
+        width="64"
+        height="64"
+        rx="14"
+        className="fill-[#10223c] dark:fill-[#1c3a63]"
+      />
       <rect
         x="0.5"
         y="0.5"
@@ -19,7 +26,7 @@ export function Logo({ className }: { className?: string }) {
         rx="13.5"
         fill="none"
         stroke="#d3ac47"
-        strokeOpacity="0.35"
+        className="[stroke-opacity:0.35] dark:[stroke-opacity:0.6]"
       />
       <g fill="#d3ac47">
         <rect className="bar" x="17" y="29" width="6.5" height="10" rx="1" />

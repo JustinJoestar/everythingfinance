@@ -14,6 +14,16 @@ const NAV = [
   { href: "/glossary", label: "Glossary" },
 ];
 
+// A gold rule under the active link, the same accounting mark the site
+// uses under headings.
+function navClass(active: boolean) {
+  return `whitespace-nowrap border-b-2 px-3.5 py-1.5 text-sm font-medium transition-colors ${
+    active
+      ? "border-accent text-ink"
+      : "border-transparent text-muted hover:text-ink"
+  }`;
+}
+
 export function Header({
   userEmail,
   streakDays,
@@ -26,19 +36,37 @@ export function Header({
   return (
     <header className="sticky top-0 z-40 border-b border-edge bg-surface/90 backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-14 items-center justify-between gap-3">
-          <Link href="/" className="flex shrink-0 items-center gap-2.5">
+        {/* Brand left, nav center, actions right: justify-between opens the
+            row up. The nav folds to its own line below the lg breakpoint. */}
+        <div className="flex h-16 items-center justify-between gap-6">
+          <Link
+            href="/"
+            className="flex shrink-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             <Logo className="h-8 w-8" />
             <span className="font-serif text-lg font-semibold tracking-tight">
               Everything Finance
             </span>
           </Link>
 
-          <div className="flex items-center gap-1.5">
+          <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+            {NAV.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                aria-current={pathname.startsWith(href) ? "page" : undefined}
+                className={navClass(pathname.startsWith(href))}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             {streakDays > 0 && (
               <span
                 title={`${streakDays}-day learning streak`}
-                className="mr-1 hidden items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 font-mono text-xs font-medium text-accent sm:flex"
+                className="hidden items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 font-mono text-xs font-medium text-accent sm:flex"
               >
                 <svg
                   width="12"
@@ -61,23 +89,21 @@ export function Header({
           </div>
         </div>
 
-        <nav className="-mb-px flex gap-1 overflow-x-auto" aria-label="Main">
-          {NAV.map(({ href, label }) => {
-            const active = pathname.startsWith(href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`whitespace-nowrap border-b-2 px-3 pb-2.5 pt-1 text-sm font-medium transition-colors ${
-                  active
-                    ? "border-accent text-ink"
-                    : "border-transparent text-muted hover:text-ink"
-                }`}
-              >
-                {label}
-              </Link>
-            );
-          })}
+        {/* Below lg the nav rides its own scrollable row. */}
+        <nav
+          className="-mt-1 flex gap-1 overflow-x-auto pb-2 lg:hidden"
+          aria-label="Main"
+        >
+          {NAV.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              aria-current={pathname.startsWith(href) ? "page" : undefined}
+              className={navClass(pathname.startsWith(href))}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
       </div>
     </header>
