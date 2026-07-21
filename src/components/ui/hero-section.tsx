@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dateline } from "@/components/ui/dateline";
+import { ShinyButton } from "@/components/ui/shiny-button";
 import { LedgerRule } from "@/components/ui/ledger-rule";
 import { cn } from "@/lib/utils";
 
@@ -123,17 +124,12 @@ export function HeroSection({
         className="anim-rise mt-8 flex flex-wrap items-center justify-center gap-3"
         style={d(0.26)}
       >
-        <Button asChild size="lg">
-          <Link href={primaryCta.href} className="group">
-            {primaryCta.label}
-            <ArrowRight
-              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
-              aria-hidden
-            />
-          </Link>
-        </Button>
+        <ShinyButton href={primaryCta.href}>
+          {primaryCta.label}
+          <ArrowRight className="h-4 w-4" aria-hidden />
+        </ShinyButton>
         {secondaryCta && (
-          <Button asChild size="lg" variant="outline">
+          <Button asChild size="lg" variant="outline" className="rounded-full">
             <Link href={secondaryCta.href}>{secondaryCta.label}</Link>
           </Button>
         )}

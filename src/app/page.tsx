@@ -9,6 +9,7 @@ import {
 import { HeroSection } from "@/components/ui/hero-section";
 import { LedgerRule } from "@/components/ui/ledger-rule";
 import { Reveal } from "@/components/ui/reveal";
+import { ShinyButton } from "@/components/ui/shiny-button";
 import { getShowcase } from "@/lib/data";
 import { relativeTime } from "@/lib/dates";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/types";
@@ -213,24 +214,15 @@ export default async function LandingPage() {
             takes care of the rest.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button
-              asChild
-              size="lg"
-              className="bg-[#d3ac47] text-[#10203a] shadow-sm hover:bg-[#e2be5e]"
-            >
-              <Link href="/feed" className="group">
-                Read today&rsquo;s news
-                <ArrowRight
-                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
-                  aria-hidden
-                />
-              </Link>
-            </Button>
+            <ShinyButton gold href="/feed">
+              Read today&rsquo;s news
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </ShinyButton>
             <Button
               asChild
               size="lg"
               variant="ghost"
-              className="text-panel-muted hover:bg-white/10 hover:text-panel-ink"
+              className="rounded-full text-panel-muted hover:bg-white/10 hover:text-panel-ink"
             >
               <Link href="/glossary">Browse the glossary</Link>
             </Button>
