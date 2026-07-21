@@ -1,7 +1,7 @@
 "use client";
 
 import createGlobe from "cobe";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 
 // A slow-spinning globe in the site's palette: a navy sphere with matte
 // gold marks over the world's financial centers. Rebuilt from a cyan
@@ -41,27 +41,40 @@ const THEME = {
   },
 };
 
+// The globe re-tints on theme change and holds still under reduced motion.
+// Both are external browser state, so useSyncExternalStore reads them
+// without a setState-in-effect and stays clean through hydration.
+const subscribeTheme = (cb: () => void) => {
+  const obs = new MutationObserver(cb);
+  obs.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+  return () => obs.disconnect();
+};
+const getThemeSnapshot = () =>
+  document.documentElement.classList.contains("dark");
+
+const subscribeMotion = (cb: () => void) => {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
+const getMotionSnapshot = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 export function Globe({ className = "" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const phiRef = useRef(0);
   const widthRef = useRef(0);
   const pointerInteracting = useRef<number | null>(null);
   const dragRef = useRef(0);
-  const [dark, setDark] = useState(true);
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  // Track theme (the .dark class on <html>) and the motion preference.
-  useEffect(() => {
-    const el = document.documentElement;
-    const readTheme = () => setDark(el.classList.contains("dark"));
-    readTheme();
-    const obs = new MutationObserver(readTheme);
-    obs.observe(el, { attributes: true, attributeFilter: ["class"] });
-    setReduceMotion(
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
-    return () => obs.disconnect();
-  }, []);
+  const dark = useSyncExternalStore(subscribeTheme, getThemeSnapshot, () => true);
+  const reduceMotion = useSyncExternalStore(
+    subscribeMotion,
+    getMotionSnapshot,
+    () => false
+  );
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     pointerInteracting.current = e.clientX - dragRef.current;
