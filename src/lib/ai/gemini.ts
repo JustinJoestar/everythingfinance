@@ -135,7 +135,7 @@ ${list}`;
   async generateRecap(items: DigestItem[]): Promise<string[]> {
     const prompt = `You write a daily digest for "Everything Finance". ${AUDIENCE}
 
-From today's finance news below, write 3-5 bullets covering the MOST important events across stocks, crypto, macro, and world events. Each bullet: 1-2 sentences, self-contained, plain English.
+From today's finance news below, write 5-8 bullets covering the MOST important events across stocks, crypto, macro, and world events. Aim to touch every category that has real news today. Each bullet: 2-3 sentences that give what happened with the key figures (prices, percentages, amounts), then why it matters for markets or for ordinary people. Self-contained, plain English, no jargon left unexplained.
 
 Return ONLY a JSON array of strings: ["bullet one", "bullet two"]
 
@@ -145,7 +145,7 @@ ${digestText(items)}`;
     const parsed = parseJson<unknown[]>(await callGemini(prompt));
     const bullets = parsed.filter((b): b is string => typeof b === "string");
     if (bullets.length === 0) throw new Error("Recap came back empty");
-    return bullets.slice(0, 5);
+    return bullets.slice(0, 8);
   },
 
   async generateFlashcards(items: DigestItem[]): Promise<FlashcardDraft[]> {

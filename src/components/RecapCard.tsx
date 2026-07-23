@@ -60,10 +60,14 @@ export function RecapCard({
   }
 
   return (
+    // On desktop the card is sticky, so a long recap could outgrow the
+    // screen with no way to reach the bottom. Capping the card at the
+    // viewport (minus the sticky offset) and letting the bullet list
+    // scroll inside keeps the header and streak button always in view.
     <section
       id="todays-recap"
       aria-label="Today's recap"
-      className="scroll-mt-28 rounded-xl border border-edge bg-surface p-6 shadow-sm"
+      className="scroll-mt-28 rounded-xl border border-edge bg-surface p-6 shadow-sm lg:flex lg:max-h-[calc(100dvh-8.5rem)] lg:flex-col"
     >
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="font-serif text-lg font-semibold">Today’s recap</h2>
@@ -79,7 +83,7 @@ export function RecapCard({
         <span className="tabular-nums text-muted">{countdown ?? "--:--"}</span>
       </p>
 
-      <ul className="mt-4 space-y-3">
+      <ul className="mt-4 space-y-3 overscroll-contain lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-2">
         {recap.bullets.map((b, i) => (
           <li key={i} className="flex gap-3 text-[15px] leading-relaxed">
             <span
