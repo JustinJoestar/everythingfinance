@@ -38,7 +38,7 @@ const FEATURES = [
   {
     icon: Brain,
     title: "Flashcards that stick",
-    text: "Each week's news becomes a deck of spaced-repetition flashcards. A card comes back right before you'd forget it.",
+    text: "Each day's news becomes a fresh deck of spaced-repetition flashcards. A card comes back right before you'd forget it.",
   },
   {
     icon: BookOpen,
@@ -48,7 +48,7 @@ const FEATURES = [
   {
     icon: Flame,
     title: "A streak worth keeping",
-    text: "Read the daily recap, review a card, or take the weekly quiz to keep your learning streak alive, one day at a time.",
+    text: "Read the daily recap, review a card, or take the daily quiz to keep your learning streak alive, one day at a time.",
   },
 ];
 
@@ -66,7 +66,7 @@ const STEPS = [
   {
     number: "03",
     title: "You make it stick",
-    text: "A daily recap, weekly quiz, and spaced-repetition flashcards turn reading the news into actually understanding the markets.",
+    text: "A daily recap, quiz, and deck of spaced-repetition flashcards turn reading the news into actually understanding the markets.",
   },
 ];
 

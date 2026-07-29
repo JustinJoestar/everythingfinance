@@ -29,6 +29,8 @@ create table if not exists recaps (
   created_at  timestamptz not null default now()
 );
 
+-- week_start kept its name from the weekly era; it now holds the ET day
+-- of the quiz (one quiz per day).
 create table if not exists quizzes (
   id          uuid primary key default gen_random_uuid(),
   week_start  date not null unique,
@@ -36,6 +38,8 @@ create table if not exists quizzes (
   created_at  timestamptz not null default now()
 );
 
+-- week_start kept its name from the weekly era; it now holds the ET day
+-- of the deck (a fresh deck per day).
 create table if not exists flashcards (
   id          uuid primary key default gen_random_uuid(),
   week_start  date not null,

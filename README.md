@@ -2,7 +2,7 @@
 
 Finance news from stocks, crypto, macro, and world events in one feed, with
 AI summaries in plain English. Learning tools help it stick:
-spaced-repetition flashcards, a weekly quiz, a plain-language glossary, and
+spaced-repetition flashcards, a daily quiz, a plain-language glossary, and
 a daily streak.
 
 The whole thing runs on free tiers (Vercel, Supabase, the Gemini free API,
@@ -15,7 +15,7 @@ GitHub Actions (free scheduler)
   ├─ every 30m → POST /api/cron/ingest RSS + Guardian → de-dupe → Gemini
   │                                    summarize/categorize → Postgres
   ├─ daily   → POST /api/cron/recap    3-5 bullet "Today's recap"
-  └─ weekly  → POST /api/cron/weekly   flashcards + quiz from the week's news
+  └─ daily   → POST /api/cron/daily    flashcards + quiz from the day's news
 
 Next.js app (Vercel) → only ever READS pre-computed rows from Supabase.
 The AI is never called on page load, so AI usage scales with article
@@ -85,9 +85,9 @@ business/world coverage.
 1. In the GitHub repo: Settings → Secrets and variables → Actions → add
    `APP_URL` (your Vercel URL, no trailing slash) and `CRON_SECRET`.
 2. The workflow in `.github/workflows/cron.yml` runs ingestion every 30
-   minutes, the recap daily, and flashcards/quiz weekly.
+   minutes, and the recap plus flashcards/quiz daily.
 3. Kick things off manually: Actions → "Scheduled jobs" → Run workflow →
-   `seed` (loads the glossary), then `ingest`, then `recap`, then `weekly`.
+   `seed` (loads the glossary), then `ingest`, then `recap`, then `daily`.
 
 Or from a terminal:
 
@@ -95,7 +95,7 @@ Or from a terminal:
 curl -X POST -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/admin/seed"
 curl -X POST -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/cron/ingest"
 curl -X POST -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/cron/recap"
-curl -X POST -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/cron/weekly"
+curl -X POST -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/cron/daily"
 ```
 
 ## Adding news sources
@@ -113,7 +113,7 @@ file. Never add NewsAPI.org; its free tier forbids production use.
 | `src/lib/sources.ts` | News source config (edit to add feeds) |
 | `src/lib/sm2.ts` | Spaced-repetition scheduling |
 | `src/lib/streak.ts` | Daily streak logic (ET day boundary) |
-| `src/app/api/cron/*` | Ingest / recap / weekly endpoints (CRON_SECRET) |
+| `src/app/api/cron/*` | Ingest / recap / daily endpoints (CRON_SECRET) |
 | `src/app/api/*` | Quiz, flashcards, streak, glossary endpoints |
 | `supabase/schema.sql` | Full schema + RLS policies (run once) |
 | `.github/workflows/cron.yml` | Free scheduler |

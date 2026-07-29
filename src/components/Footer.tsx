@@ -5,7 +5,7 @@ import { Logo } from "./ui/logo";
 const FOOTER_NAV = [
   { href: "/feed", label: "Feed" },
   { href: "/flashcards", label: "Flashcards" },
-  { href: "/quiz", label: "Weekly quiz" },
+  { href: "/quiz", label: "Daily quiz" },
   { href: "/glossary", label: "Glossary" },
 ];
 

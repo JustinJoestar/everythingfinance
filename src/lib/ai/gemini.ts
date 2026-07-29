@@ -151,11 +151,11 @@ ${digestText(items)}`;
   async generateFlashcards(items: DigestItem[]): Promise<FlashcardDraft[]> {
     const prompt = `You create learning flashcards for "Everything Finance". ${AUDIENCE}
 
-From this week's finance news below, create 12 flashcards that teach the concepts and events a beginner should retain. Front: a short question or concept name. Back: a plain-English explanation in 1-3 sentences, understandable by a 15-year-old. Mix concept cards (e.g. "What is a rate cut?") with event cards (e.g. "What did the Fed do this week?"). Assign each card one category from: "stocks", "crypto", "macro", "world".
+From today's finance news below, create 8 flashcards that teach the concepts and events a beginner should retain. Front: a short question or concept name. Back: a plain-English explanation in 1-3 sentences, understandable by a 15-year-old. Mix concept cards (e.g. "What is a rate cut?") with event cards (e.g. "What did the Fed do today?"). Assign each card one category from: "stocks", "crypto", "macro", "world".
 
 Return ONLY a JSON array: [{"front": "...", "back": "...", "category": "macro"}]
 
-This week's news:
+Today's news:
 ${digestText(items)}`;
 
     const parsed = parseJson<
@@ -172,15 +172,15 @@ ${digestText(items)}`;
   },
 
   async generateQuiz(items: DigestItem[]): Promise<QuizQuestion[]> {
-    const prompt = `You create a weekly news quiz for "Everything Finance". ${AUDIENCE}
+    const prompt = `You create a daily news quiz for "Everything Finance". ${AUDIENCE}
 
-From this week's finance news below, write 7 multiple-choice questions testing understanding of what happened and why it matters. Each question has exactly 4 options and one correct answer. Include a 1-2 sentence plain-English explanation of the correct answer. Vary difficulty; no trick questions.
+From today's finance news below, write 6 multiple-choice questions testing understanding of what happened and why it matters. Each question has exactly 4 options and one correct answer. Include a 1-2 sentence plain-English explanation of the correct answer. Vary difficulty; no trick questions.
 
 Return ONLY a JSON array:
 [{"question": "...", "options": ["A", "B", "C", "D"], "answer": 0, "explanation": "..."}]
 ("answer" is the zero-based index of the correct option.)
 
-This week's news:
+Today's news:
 ${digestText(items)}`;
 
     const parsed = parseJson<QuizQuestion[]>(await callGemini(prompt));

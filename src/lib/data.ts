@@ -13,9 +13,10 @@ import type {
   Article,
   Category,
   Flashcard,
+  FlashcardArchiveEntry,
   GlossaryEntry,
   Quiz,
-  QuizAttempt,
+  QuizArchiveEntry,
   Recap,
   Streak,
 } from "./types";
@@ -186,7 +187,9 @@ export async function getStreak(): Promise<Streak | null> {
   return (data as Streak) ?? { current_streak: 0, longest_streak: 0, last_activity_date: null };
 }
 
-export async function getQuizAttempts(): Promise<QuizAttempt[]> {
+/** The signed-in user's completed quizzes, one row per quiz day with the
+ *  best score. Newest day first. */
+export async function getQuizArchive(): Promise<QuizArchiveEntry[]> {
   if (!supabaseConfigured) return [];
   const db = await getServerClient();
   const {
@@ -196,11 +199,66 @@ export async function getQuizAttempts(): Promise<QuizAttempt[]> {
 
   const { data } = await db
     .from("quiz_attempts")
-    .select("quiz_id, score, total, created_at")
+    .select("score, total, created_at, quizzes(week_start)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(10);
-  return (data as QuizAttempt[]) ?? [];
+    .limit(120);
+
+  // Best score per quiz day.
+  const byDay = new Map<string, QuizArchiveEntry>();
+  for (const row of data ?? []) {
+    const quiz = row.quizzes as unknown as { week_start: string } | null;
+    if (!quiz) continue;
+    const existing = byDay.get(quiz.week_start);
+    if (!existing || row.score > existing.score) {
+      byDay.set(quiz.week_start, {
+        day: quiz.week_start,
+        score: row.score,
+        total: row.total,
+      });
+    }
+  }
+  return [...byDay.values()].sort((a, b) => (a.day < b.day ? 1 : -1));
+}
+
+/** The signed-in user's flashcard history: for each deck day where they
+ *  reviewed at least one card, how many of that day's cards they got
+ *  through. Newest day first. */
+export async function getFlashcardArchive(): Promise<FlashcardArchiveEntry[]> {
+  if (!supabaseConfigured) return [];
+  const db = await getServerClient();
+  const {
+    data: { user },
+  } = await db.auth.getUser();
+  if (!user) return [];
+
+  const [{ data: progress }, { data: decks }] = await Promise.all([
+    db
+      .from("card_progress")
+      .select("card_id, flashcards(week_start)")
+      .eq("user_id", user.id),
+    db.from("flashcards").select("week_start"),
+  ]);
+
+  const deckSize = new Map<string, number>();
+  for (const row of decks ?? []) {
+    deckSize.set(row.week_start, (deckSize.get(row.week_start) ?? 0) + 1);
+  }
+
+  const reviewed = new Map<string, number>();
+  for (const row of progress ?? []) {
+    const card = row.flashcards as unknown as { week_start: string } | null;
+    if (!card) continue;
+    reviewed.set(card.week_start, (reviewed.get(card.week_start) ?? 0) + 1);
+  }
+
+  return [...reviewed.entries()]
+    .map(([day, count]) => ({
+      day,
+      reviewed: count,
+      total: deckSize.get(day) ?? count,
+    }))
+    .sort((a, b) => (a.day < b.day ? 1 : -1));
 }
 
 /** Card progress rows for the signed-in user, keyed by card id. */

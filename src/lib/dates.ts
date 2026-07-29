@@ -59,6 +59,18 @@ export function relativeTime(iso: string): string {
   });
 }
 
+/** Long-form date for a YYYY-MM-DD string, e.g. "Friday, July 10". The
+ *  string is treated as a plain calendar date, so no timezone shifting. */
+export function longDate(dateStr: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  }).format(new Date(Date.UTC(y, m - 1, d)));
+}
+
 /** Long-form ET date for headings, e.g. "Friday, July 10". */
 export function etLongDate(d: Date = new Date()): string {
   return new Intl.DateTimeFormat("en-US", {

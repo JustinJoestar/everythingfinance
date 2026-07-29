@@ -4,18 +4,17 @@ import { track } from "@vercel/analytics";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import type { Quiz, QuizAttempt } from "@/lib/types";
+import { longDate } from "@/lib/dates";
+import type { Quiz } from "@/lib/types";
 
 type Phase = "intro" | "playing" | "done";
 
 export function QuizPlayer({
   quiz,
   signedIn,
-  pastAttempts,
 }: {
   quiz: Quiz;
   signedIn: boolean;
-  pastAttempts: QuizAttempt[];
 }) {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("intro");
@@ -76,16 +75,16 @@ export function QuizPlayer({
     return (
       <div className="rounded-xl border border-edge bg-surface p-8 text-center shadow-sm">
         <p className="font-mono text-xs font-medium uppercase tracking-[0.14em] text-accent">
-          Week of {quiz.week_start}
+          {longDate(quiz.week_start)}
         </p>
         <h2 className="mt-2 font-serif text-2xl font-semibold">
-          How closely did you follow the markets?
+          How closely did you follow the markets today?
         </h2>
         <p className="mt-2 text-sm text-muted">
           {questions.length} questions, with an explanation after every answer
           {signedIn
-            ? ". Your score is saved."
-            : ". Sign in to save your scores."}
+            ? ". Your score lands in your archive."
+            : ". Sign in to build an archive of your scores."}
         </p>
         <button
           onClick={restart}
@@ -93,29 +92,6 @@ export function QuizPlayer({
         >
           Start the quiz
         </button>
-
-        {pastAttempts.length > 0 && (
-          <div className="mt-7 border-t border-edge pt-4 text-left">
-            <p className="font-mono text-xs font-medium uppercase tracking-[0.14em] text-faint">
-              Your recent scores
-            </p>
-            <ul className="mt-2 space-y-1.5 text-sm text-muted">
-              {pastAttempts.slice(0, 5).map((a, i) => (
-                <li key={i} className="flex items-center justify-between">
-                  <span>
-                    {new Date(a.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                  <span className="font-semibold text-ink">
-                    {a.score}/{a.total}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
     );
   }
@@ -124,12 +100,12 @@ export function QuizPlayer({
     const pct = Math.round((score / questions.length) * 100);
     const message =
       pct === 100
-        ? "A perfect score. You followed the markets closely this week."
+        ? "A perfect score. You followed the markets closely today."
         : pct >= 70
           ? "A strong result. You caught most of what mattered."
           : pct >= 40
             ? "A fair showing. The recap and flashcards will fill in the gaps."
-            : "A difficult week. Skim the feed and try again; repetition is the point.";
+            : "A tough day. Skim the feed and try again; repetition is the point.";
 
     return (
       <div className="rounded-xl border border-edge bg-surface p-8 text-center shadow-sm">
@@ -142,7 +118,7 @@ export function QuizPlayer({
         <p className="mt-3 text-sm text-muted">{message}</p>
         {signedIn && saved && (
           <p className="mt-1 text-xs text-success">
-            Score saved to your history
+            Score saved to your archive
           </p>
         )}
         <button

@@ -125,7 +125,7 @@ export function FlashcardDeck({
       <div className="flex items-center justify-between font-mono text-[13px] text-muted">
         <span>
           Card {Math.min(index + 1, queue.length)} of {queue.length}
-          {signedIn && ` · ${totalCards} in this week’s deck`}
+          {signedIn && ` · ${totalCards} in today’s deck`}
         </span>
         {!signedIn && <span className="text-xs">Sign in to save progress</span>}
       </div>

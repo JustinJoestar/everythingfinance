@@ -32,20 +32,29 @@ export interface QuizQuestion {
 
 export interface Quiz {
   id: string;
-  week_start: string; // YYYY-MM-DD (ET Monday)
+  // The quiz's ET day. The column kept its name from the weekly era.
+  week_start: string; // YYYY-MM-DD (ET)
   questions: QuizQuestion[];
 }
 
-export interface QuizAttempt {
-  quiz_id: string;
+/** One archive row: the user's best score on that day's quiz. */
+export interface QuizArchiveEntry {
+  day: string; // YYYY-MM-DD (ET)
   score: number;
   total: number;
-  created_at: string;
+}
+
+/** One archive row: how much of that day's deck the user reviewed. */
+export interface FlashcardArchiveEntry {
+  day: string; // YYYY-MM-DD (ET)
+  reviewed: number;
+  total: number;
 }
 
 export interface Flashcard {
   id: string;
-  week_start: string;
+  // The deck's ET day. The column kept its name from the weekly era.
+  week_start: string; // YYYY-MM-DD (ET)
   front: string;
   back: string;
   category: Category;

@@ -1,8 +1,8 @@
 # Free scheduler for the ingestion pipeline. Vercel's free plan only allows
 # once-daily crons, so GitHub Actions triggers our endpoints instead:
 #   - every 30m: news ingestion (+ AI summaries)
-#   - daily:   "Today's recap" (~6:30 AM ET)
-#   - weekly:  flashcards + quiz (Mondays)
+#   - daily:   "Today's recap" (~6:35 AM ET)
+#   - daily:   flashcards + quiz for the day (~6:50 AM ET)
 #
 # Requires two repository secrets (Settings → Secrets and variables → Actions):
 #   APP_URL      e.g. https://everythingfinance.vercel.app  (no trailing slash)
@@ -14,13 +14,13 @@ on:
   schedule:
     - cron: "0,30 * * * *"  # ingestion every 30 min, on the hour and half hour
     - cron: "35 10 * * *"  # daily recap — 10:35 UTC ≈ 6:35 AM ET
-    - cron: "50 10 * * 1"  # weekly flashcards + quiz — Mondays
+    - cron: "50 10 * * *"  # daily flashcards + quiz — 10:50 UTC ≈ 6:50 AM ET
   workflow_dispatch:
     inputs:
       job:
         description: "Job to run manually"
         type: choice
-        options: [ingest, recap, weekly, seed]
+        options: [ingest, recap, daily, seed]
         default: ingest
 
 jobs:
@@ -34,13 +34,13 @@ jobs:
             case "${{ inputs.job }}" in
               seed) echo "path=/api/admin/seed" >> "$GITHUB_OUTPUT" ;;
               recap) echo "path=/api/cron/recap" >> "$GITHUB_OUTPUT" ;;
-              weekly) echo "path=/api/cron/weekly" >> "$GITHUB_OUTPUT" ;;
+              daily) echo "path=/api/cron/daily" >> "$GITHUB_OUTPUT" ;;
               *) echo "path=/api/cron/ingest" >> "$GITHUB_OUTPUT" ;;
             esac
           elif [ "${{ github.event.schedule }}" = "35 10 * * *" ]; then
             echo "path=/api/cron/recap" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.schedule }}" = "50 10 * * 1" ]; then
-            echo "path=/api/cron/weekly" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "50 10 * * *" ]; then
+            echo "path=/api/cron/daily" >> "$GITHUB_OUTPUT"
           else
             echo "path=/api/cron/ingest" >> "$GITHUB_OUTPUT"
           fi
@@ -55,7 +55,10 @@ jobs:
           # After an ingest, refresh the recap. When the run brought in new
           # articles (a real Gemini update), regenerate it (force=1) so the
           # recap tracks the latest news; otherwise just make sure today's
-          # exists (the endpoint self-skips). Never fails the job.
+          # exists (the endpoint self-skips). Also make sure today's quiz
+          # and flashcards exist (that endpoint self-skips too), so a
+          # missed 10:50 run can never leave the day without them. Never
+          # fails the job.
           if [ "${{ steps.pick.outputs.path }}" = "/api/cron/ingest" ]; then
             NEW=$(printf '%s' "$RESP" | grep -oE '"newArticles":[0-9]+' | grep -oE '[0-9]+' | head -1)
             if [ "${NEW:-0}" -gt 0 ]; then
@@ -67,4 +70,8 @@ jobs:
               -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
               --max-time 120 \
               "$RECAP_URL" || true
+            curl --fail-with-body -sS -X POST \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              --max-time 320 \
+              "${{ secrets.APP_URL }}/api/cron/daily" || true
           fi

@@ -1,4 +1,4 @@
-import { etDateString, etWeekStart } from "./dates";
+import { etDateString } from "./dates";
 import type { Article, Flashcard, Quiz, Recap } from "./types";
 
 // Sample content served when Supabase isn't configured, so the app is
@@ -143,7 +143,7 @@ export const MOCK_RECAP: Recap = {
 
 export const MOCK_QUIZ: Quiz = {
   id: "mock-quiz",
-  week_start: etWeekStart(),
+  week_start: etDateString(),
   questions: [
     {
       question: "What did the Federal Reserve do with interest rates this week?",
@@ -209,12 +209,12 @@ export const MOCK_QUIZ: Quiz = {
 };
 
 export const MOCK_FLASHCARDS: Flashcard[] = [
-  { id: "mf1", week_start: etWeekStart(), category: "macro", front: "What does it mean when the Fed 'holds rates steady'?", back: "The central bank left its key interest rate unchanged, so borrowing costs stay the same for now. Markets then focus on hints about the next move." },
-  { id: "mf2", week_start: etWeekStart(), category: "macro", front: "Why do stocks usually like rate cuts?", back: "Lower rates make borrowing cheaper for companies and make savings accounts less attractive, pushing money toward stocks." },
-  { id: "mf3", week_start: etWeekStart(), category: "stocks", front: "What is an earnings report?", back: "A company's quarterly report card showing profit and revenue. Stocks jump or drop based on whether results beat or miss expectations." },
-  { id: "mf4", week_start: etWeekStart(), category: "crypto", front: "What is a bitcoin ETF?", back: "A fund traded on the stock market that tracks bitcoin's price, letting people invest through a normal brokerage account without holding crypto themselves." },
-  { id: "mf5", week_start: etWeekStart(), category: "world", front: "How can Middle East tensions affect your gas prices?", back: "A lot of the world's oil ships through that region. Threats to supply push oil prices up, and gas prices follow within weeks." },
-  { id: "mf6", week_start: etWeekStart(), category: "macro", front: "What is CPI?", back: "The Consumer Price Index, the main US inflation measure. It tracks prices of everyday goods, and its monthly release regularly moves markets." },
-  { id: "mf7", week_start: etWeekStart(), category: "stocks", front: "What does 'record close' mean?", back: "The index ended the trading day at its highest level ever. It signals strong investor optimism, though records alone don't predict what happens next." },
-  { id: "mf8", week_start: etWeekStart(), category: "crypto", front: "What is a stablecoin?", back: "A cryptocurrency designed to always be worth $1, backed by real reserves. Traders use them as digital cash inside the crypto world." },
+  { id: "mf1", week_start: etDateString(), category: "macro", front: "What does it mean when the Fed 'holds rates steady'?", back: "The central bank left its key interest rate unchanged, so borrowing costs stay the same for now. Markets then focus on hints about the next move." },
+  { id: "mf2", week_start: etDateString(), category: "macro", front: "Why do stocks usually like rate cuts?", back: "Lower rates make borrowing cheaper for companies and make savings accounts less attractive, pushing money toward stocks." },
+  { id: "mf3", week_start: etDateString(), category: "stocks", front: "What is an earnings report?", back: "A company's quarterly report card showing profit and revenue. Stocks jump or drop based on whether results beat or miss expectations." },
+  { id: "mf4", week_start: etDateString(), category: "crypto", front: "What is a bitcoin ETF?", back: "A fund traded on the stock market that tracks bitcoin's price, letting people invest through a normal brokerage account without holding crypto themselves." },
+  { id: "mf5", week_start: etDateString(), category: "world", front: "How can Middle East tensions affect your gas prices?", back: "A lot of the world's oil ships through that region. Threats to supply push oil prices up, and gas prices follow within weeks." },
+  { id: "mf6", week_start: etDateString(), category: "macro", front: "What is CPI?", back: "The Consumer Price Index, the main US inflation measure. It tracks prices of everyday goods, and its monthly release regularly moves markets." },
+  { id: "mf7", week_start: etDateString(), category: "stocks", front: "What does 'record close' mean?", back: "The index ended the trading day at its highest level ever. It signals strong investor optimism, though records alone don't predict what happens next." },
+  { id: "mf8", week_start: etDateString(), category: "crypto", front: "What is a stablecoin?", back: "A cryptocurrency designed to always be worth $1, backed by real reserves. Traders use them as digital cash inside the crypto world." },
 ];
