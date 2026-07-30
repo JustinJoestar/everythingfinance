@@ -15,8 +15,17 @@ export interface RssSource {
 export const RSS_SOURCES: RssSource[] = [
   // --- Stocks / markets ---
   {
+    // Yahoo's syndication digest. Its items surface a day late (median
+    // 32h), so they fill the deeper pages of the feed, not page 1.
     name: "Yahoo Finance",
     url: "https://finance.yahoo.com/news/rssindex",
+    hint: "stocks",
+  },
+  {
+    // Yahoo's S&P 500 ticker-headline feed is the real-time one; this is
+    // what puts fresh Yahoo stories at the top of the feed.
+    name: "Yahoo Finance",
+    url: "https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US",
     hint: "stocks",
   },
   {
